@@ -1,0 +1,5 @@
+Fonts used in this design:
+
+Font: Arvo
+Author: Anton Koovit
+Url: https://fonts.google.com/specimen/Arvo
