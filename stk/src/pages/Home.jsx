@@ -65,20 +65,6 @@ function Home() {
           <h1 className='text-5xl'>Stock Expert</h1>
           <h3 className='text-2xl text-gray-300 mt-2'>Your one-stop solution for stock-related queries.</h3>
   
-          
-  
-          {/* results section */}
-          {results && (
-            <div className='w-full flex flex-col items-center justify-center'>
-              {/* name of the stock */}
-              <h2 className='text-2xl'>{results?.ticker}</h2>
-              {/* graph */}
-              
-  
-              {/* table */}
-              
-            </div>
-          )}
         </div>
       </div>
     )
