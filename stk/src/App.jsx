@@ -1,20 +1,59 @@
 import { useState } from 'react'
-import bgImage from "./assets/6256878.jpg"
+import bgImage from "./assets/6256878.jpg";
+import axios from 'axios';
 import './App.css'
 
 function App() {
-  const [stock, setStock] = useState("");
+  const [ticker, setTicker] = useState("");
   const [days, setDays] = useState("");
+  const [apiURL , setApiURL] = useState("");
+  const [loading , setLoading] = useState(false);
+  const [error , setError] = useState("");
+  const [results, setResults] = useState(null);
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Selected Stock:", stock);
-    console.log("Number of Days:", days);
+    // if(!apiURL){
+    //   setError("URL needed to connect to backend");
+    // }
+    if(!ticker){
+      setError("Ticker invalid. Please enter a valid ticker");
+      return;
+    }
+    if(!days){
+      setError("Number of days needed to predict.");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResults(null);
+
+    try {
+      let apiURL = "https://8724-34-106-228-74.ngrok-free.app";
+
+      const baseURL = apiURL.endsWith('/') ? apiURL.slice(0,-1) : apiURL;
+
+      const response = await axios.post(`${baseURL}/predict`, {
+        ticker : ticker.toUpperCase(),
+        days : parseInt(days),
+      })
+      
+      setResults(response.data);
+
+    } catch (error) {
+        console.log("Error fetching results. " , error);
+        setError(error.response?.data?.error || "Failed to get prediction");
+    } finally{
+      setLoading(false);
+    }
+
   };
 
   return (
-    <div className='h-screen w-screen relative'>
-      <div className="absolute top-0 left-0 h-full w-full bg-cover bg-center" style={{ backgroundImage:  `url(${bgImage})` }}></div>
+    <div className='min-h-screen bg-black w-screen relative'>
+      <div className="absolute top-0 left-0 h-screen w-full bg-cover bg-center" style={{ backgroundImage:  `url(${bgImage})` }}></div>
       
       {/* Overlay */}
       <div className="absolute top-0 left-0 h-full w-full bg-black opacity-50"></div>
@@ -32,8 +71,8 @@ function App() {
               <label className="text-sm">Stock Name:</label>
               <select 
                 className="bg-gray-800 text-white text-sm px-3 py-1 rounded"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                value={ticker}
+                onChange={(e) => setTicker(e.target.value)}
               >
                 <option value="">Select</option>
                 <option value="TSLA">TSLA</option>
@@ -56,11 +95,43 @@ function App() {
 
           {/* Submit Button (Next Line) */}
           <div className="mt-4">
-            <button type="submit" className="bg-gray-800 w-full px-30 py-2 text-white text-sm rounded hover:border hover:border-white">
-              Submit
+            <button type="submit" disabled={loading} className="bg-gray-800 w-full px-30 py-2 text-white text-sm rounded hover:border hover:border-white">
+              {loading ? "Predicting Stock Prizes" :  "Predict"}
             </button>
           </div>
         </form>
+
+        {/* results section */}
+        {results && (
+          <div className='w-full flex flex-col items-center justify-center'>
+            {/* name of the stock */}
+            <h2 className='text-2xl'>{results?.ticker}</h2>
+            {/* graph */}
+            <div>
+              <img src={`data:image/png;base64,${results.graph}`} className='w-1/2 rounded-lg shadow-lg' alt="stock prize graph" />
+            </div>
+
+            {/* table */}
+            <div className='overflow-x-auto'>
+              <table className='border-collapse'>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Predicted Prize</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.predictions.map((prediction, index) => (
+                    <tr key={index}>
+                      <td className='text-center'>{prediction.date}</td>
+                      <td className='text-center'>{prediction.predicted_price.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
