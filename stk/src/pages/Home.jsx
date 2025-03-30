@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios';
 import { useState } from 'react';
 import bgImage from "../assets/6256878.jpg";
-
+import LoadingPage from './LoadingPage';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   
@@ -12,7 +13,14 @@ function Home() {
     const [loading , setLoading] = useState(false);
     const [error , setError] = useState("");
     const [results, setResults] = useState(null);
-  
+    const [showLoading, setShowLoading] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      setTimeout(() => {
+        setShowLoading(false);
+      } , 2500);
+    } , []);
   
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -52,6 +60,12 @@ function Home() {
       }
   
     };
+
+    if(showLoading){
+      return (
+        <LoadingPage />
+      )
+    }
   
     return (
       <div className='min-h-screen bg-black w-screen relative'>
@@ -64,7 +78,8 @@ function Home() {
         <div className="relative z-10 flex flex-col text-white text-3xl font-bold py-40 items-center h-full">
           <h1 className='text-5xl'>Stock Expert</h1>
           <h3 className='text-2xl text-gray-300 mt-2'>Your one-stop solution for stock-related queries.</h3>
-  
+
+          <button onClick={() => navigate('/prediction')} className='rounded-3xl hover:cursor-pointer py-2 px-5 my-10  text-xl bg-blue-800'>Get Started</button>
         </div>
       </div>
     )
