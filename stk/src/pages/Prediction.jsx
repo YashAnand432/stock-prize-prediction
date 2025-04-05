@@ -24,7 +24,7 @@ function Prediction() {
     setResults(null);
 
     try {
-      let apiURL = "https://1899-34-125-156-58.ngrok-free.app";
+      let apiURL = "https://18b6-34-27-163-127.ngrok-free.app";
       const baseURL = apiURL.endsWith("/") ? apiURL.slice(0, -1) : apiURL;
 
       const response = await axios.post(`${baseURL}/predict`, {
@@ -42,13 +42,16 @@ function Prediction() {
   };
 
   return (
-    <div className="h-screen w-full bg-gray-800 text-white py-5 px-5">
+    <div className="min-h-screen w-full bg-gray-800 text-white py-5 px-5">
       <div className="w-full flex flex-col space-y-5">
-        <form onSubmit={handleSubmit} className="mt-10 flex flex-col items-center">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-10 flex flex-col items-center"
+        >
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-5">
               <label className="text-sm">Stock Name:</label>
-              <select
+              {/* <select
                 className="bg-gray-900 text-white text-sm px-5 py-1 rounded"
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value)}
@@ -57,7 +60,8 @@ function Prediction() {
                 <option value="TSLA">TSLA</option>
                 <option value="TATA">TATA</option>
                 <option value="AMZN">AMZN</option>
-              </select>
+              </select> */}
+              <input type="text" className="text-white bg-gray-900 px-2 py-1 rounded" value={ticker} onChange={(e)=>setTicker(e.target.value)} />
             </div>
 
             <div className="flex items-center space-x-2">
@@ -83,44 +87,43 @@ function Prediction() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <div className="flex flex-row justify-center items-center">
-            <div>
+        <div className="flex flex-col md:flex-row justify-center items-start space-y-5 md:space-y-0 md:space-x-10 mt-10">
+          <div className="flex justify-center w-full">
+            {results && results.predictions && (
+              <div className="overflow-x-auto">
+                <table className="border-collapse text-white">
+                  <thead>
+                    <tr>
+                      <th className=" shadow-xl px-4 py-2">Date</th>
+                      <th className="shadow-xl px-4 py-2">Predicted Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.predictions.map((prediction, index) => (
+                      <tr key={index}>
+                        <td className="shadow-md text-center px-4 py-2">
+                          {prediction.date}
+                        </td>
+                        <td className="shadow-md text-center px-4 py-2">
+                          {prediction.predicted_price.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
-                {results && results.predictions && (
-                    <div className="overflow-x-auto">
-                    <table className="border-collapse">
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Predicted Price</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {results.predictions.map((prediction, index) => (
-                            <tr key={index}>
-                            <td className="text-center">{prediction.date}</td>
-                            <td className="text-center">
-                                {prediction.predicted_price.toFixed(2)}
-                            </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                    </div>
-                ) }
-            </div>
-            <div>
-                {results && results.graph && (
-                    <div>
-                    <img
-                        src={`data:image/png;base64,${results.graph}`}
-                        className="w-1/2 rounded-lg shadow-lg"
-                        alt="stock price graph"
-                    />
-                    </div>
-                ) }
-            </div>
-
+          <div className="flex justify-center w-full">
+            {results && results.graph && (
+              <img
+                src={`data:image/png;base64,${results.graph}`}
+                className="w-100 h-auto rounded-lg shadow-lg"
+                alt="stock price graph"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
